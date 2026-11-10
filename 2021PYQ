@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bihar Board 12th English PYQ (Glassmorphism UI)</title>
+    <style>
+        /* --- NEOMORPHIC & GLASSMORPHISM STYLES --- */
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center; 
+            padding: 20px;
+            color: #333;
+        }
+
+        .container { 
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            max-width: 900px; 
+            width: 100%; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            position: relative;
+        }
+        
+        h1, h2, h3 { text-align: center; color: #1a1a2e; margin-bottom: 20px;}
+        
+        .section { display: none; }
+        .active-section { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Inputs & Buttons */
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 15px 0; 
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px; 
+            font-size: 16px; 
+            outline: none;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-weight: bold; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 15px;
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Quiz Options */
+        .question-box { 
+            margin-bottom: 25px; 
+            padding: 20px; 
+            border-radius: 15px; 
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .question-text { font-weight: 700; margin-bottom: 15px; font-size: 17px; color: #1a1a2e; }
+        
+        .option { 
+            display: block; 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-size: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option:hover:not(.locked) { 
+            background: rgba(255, 255, 255, 0.9);
+            transform: scale(1.01);
+        }
+
+        /* Instant Feedback Colors */
+        .option.correct-ans {
+            background: rgba(40, 167, 69, 0.8) !important;
+            color: white;
+            border-color: #28a745;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.4);
+        }
+        .option.wrong-ans {
+            background: rgba(220, 53, 69, 0.8) !important;
+            color: white;
+            border-color: #dc3545;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
+        }
+        .option.locked {
+            cursor: not-allowed;
+        }
+
+        /* Instant Reason Box */
+        .instant-reason {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-left: 5px solid #ffc107;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Results */
+        .result-box { margin-bottom: 20px; padding: 20px; border-radius: 10px; background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(255,255,255,0.8); }
+        .result-box.correct { border-left: 6px solid #28a745; }
+        .result-box.incorrect { border-left: 6px solid #dc3545; }
+        
+        /* Long Answers Box */
+        .long-ans-box { margin-top: 30px; padding: 25px; background: rgba(255, 243, 205, 0.6); border-radius: 15px; border: 1px solid rgba(255, 230, 156, 0.8); backdrop-filter: blur(5px); }
+        .long-ans-box h3 { text-align: left; border-bottom: 2px solid #ffc107; padding-bottom: 10px; margin-bottom: 15px; color: #856404; }
+        .ans-item { margin-bottom: 15px; font-size: 15px; line-height: 1.6; color: #333; }
+        .ans-item strong { color: #0056b3; }
+
+        /* Rank List */
+        .rank-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(255,255,255,0.4); border-radius: 10px; overflow: hidden; }
+        .rank-table th, .rank-table td { padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); text-align: left; }
+        .rank-table th { background-color: rgba(102, 126, 234, 0.8); color: white; }
+        
+        .nav-links { text-align: center; margin-top: 25px; }
+        .nav-links span { color: #764ba2; cursor: pointer; font-weight: bold; text-decoration: underline; }
+
+        /* Scroll to top */
+        #scrollTopBtn {
+            display: none; position: fixed; bottom: 30px; right: 30px; z-index: 99;
+            font-size: 20px; border: none; outline: none; background: #764ba2; color: white;
+            cursor: pointer; padding: 15px; border-radius: 50%; width: 50px; height: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; justify-content: center; align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="topFunction()" id="scrollTopBtn" title="Go to top">↑</button>
+
+<div class="container">
+    
+    <!-- 1. Login Section -->
+    <div id="login-section" class="section active-section">
+        <h1>Bihar Board 12th English</h1>
+        <p style="text-align: center; margin-bottom: 20px;">Practice Test with Instant Feedback & Reasons</p>
+        <input type="text" id="studentName" placeholder="Enter your Name to Start">
+        <button onclick="startTest()">Start Test</button>
+        <div class="nav-links">
+            <span onclick="showRankListPrompt()">🔒 View </span>
+        </div>
+    </div>
+
+    <!-- 2. Quiz Section -->
+    <div id="quiz-section" class="section">
+        <h2>English PYQ Test</h2>
+        <p style="text-align: center; color: #444; margin-bottom: 20px; font-size: 14px;">
+            Click on an option to see the result instantly. You can submit the test at any time.
+        </p>
+        <div id="questions-container"></div>
+        <button id="submit-btn" class="submit-btn" onclick="submitTest()">Submit Test & Save Score</button>
+    </div>
+
+    <!-- 3. Result Section -->
+    <div id="result-section" class="section">
+        <h2 id="score-display" style="font-size: 28px; color: #1a1a2e;"></h2>
+        <h3>Detailed Analysis & Explanations</h3>
+        <div id="review-container"></div>
+        
+        <div class="long-ans-box">
+            <h3>Section B: Descriptive Answers (From Answer Key)</h3>
+            
+            <div class="ans-item">
+                <strong>Q2. Explain (a): "If in thine my life thou waste, Thou art the best of mee."</strong><br>
+                This line is from John Donne's poem "Sweetest Love, I Do Not Goe". The poet says to his beloved that if she wastes her life in sorrow after his death, it can't be true that she loves him. He means that she should not cry and waste her life in his memory.
+            </div>
+            
+            <div class="ans-item">
+                <strong>Q2. Explain (b): "Until they think warm days will never cease, For Summer has o'er-brimm'd their clammy cells."</strong><br>
+                These lines are from John Keats' poem "Ode to Autumn". The poet describes the abundance of autumn. The warmth of autumn days gives the illusion that warm days will never end. Summer has filled the honeycombs (clammy cells) to the brim.
+            </div>
+
+            <div class="ans-item">
+                <strong>Q5. Short Answers (Selected from Key):</strong><br>
+                <strong>(a) What did the Fire Hymn say to the speaker?</strong> The Fire-Hymn said to the speaker that he had forgiven him and now it has taken an oath to overlook and pardon him for the sin he committed.<br><br>
+                <strong>(c) How does Keats personify autumn in the poem?</strong> Autumn is personified as one conspiring with the sun to yield a rich, ripened harvest. Also, it is personified as having hair that is "soft lifted by the winnowing wind".<br><br>
+                <strong>(g) Write a short note on William Shakespeare.</strong> William Shakespeare was an English poet, playwright, and actor, born on 26 April 1564 in Stratford upon Avon. He is regarded as the greatest writer in the English language and is nicknamed the Bard of Avon. He wrote about 39 plays, 154 sonnets, and two long narrative poems. He wrote famous works like Hamlet, Othello, King Lear, and Macbeth.<br><br>
+                <strong>(h) What are the important elements of a drama?</strong> The important elements of a drama are Plot, Character, Dialogue, Gestures, Scenic effects, Music, and Soliloquy.
+            </div>
+        </div>
+
+        <button onclick="location.reload()" style="margin-top: 30px;">Take Test Again</button>
+    </div>
+
+    <!-- 4. Rank List Section -->
+    <div id="rank-section" class="section">
+        <h2>Admin: List</h2>
+        <div id="password-prompt">
+            <p style="text-align: center; margin-bottom: 15px;">Enter Password to view List</p>
+            <input type="password" id="adminPassword" placeholder="Enter Password">
+            <button onclick="checkPassword()">View List</button>
+        </div>
+        <div id="rank-list-data" style="display: none;">
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Student Name</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-tbody">
+                    <!-- Data goes here -->
+                </tbody>
+            </table>
+            <button onclick="location.reload()" style="margin-top: 30px;">Back to Home</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- DATABASE (All 100 Questions) ---
+    const questions = [
+        { id: 1, question: "Choose the correct sentence:", options: ["Junior employees need advice from their bosses now and then.", "Junior employees need an advice from their bosses now and then.", "Junior employees need an advise from their bosses now and then.", "Junior employees needs an advice from their bosses now and then."], correct: 0, reason: "'Advice' is an uncountable noun. Also, the subject is plural, so 'need' is correct." },
+        { id: 2, question: "He said something. I did not hear it. (Choose the correct combination):", options: ["I said something which he did not hear", "He did not hear what I said", "I did not hear what he said", "I did hear what he said"], correct: 2, reason: "The combined sentence uses a noun clause 'what he said' as the object of 'did not hear'." },
+        { id: 3, question: "One man's trash is another man's ........... (Choose the most suitable word):", options: ["pleasure", "treasure", "crash", "damage"], correct: 1, reason: "The correct proverb is 'One man's trash is another man's treasure'." },
+        { id: 4, question: "Smallpox has been eradicated ........... India. (Choose the correct preposition):", options: ["for", "from", "within", "out"], correct: 1, reason: "'Eradicated' is followed by the preposition 'from'." },
+        { id: 5, question: "Choose the correctly spelt word:", options: ["Athist", "Atheist", "Athest", "Athiast"], correct: 1, reason: "The correct spelling is A-t-h-e-i-s-t." },
+        { id: 6, question: "Choose the correct synonym of 'Fragrance':", options: ["Taste", "Aroma", "Sight", "Touch"], correct: 1, reason: "'Aroma' is the closest synonym for a pleasant smell." },
+        { id: 7, question: "The synonym of 'Annual' is:", options: ["Always", "Century", "Daily", "Yearly"], correct: 3, reason: "'Annual' means happening once every year." },
+        { id: 8, question: "Let a doctor be sent for. (Choose the active voice):", options: ["Sending for a doctor", "Doctor be sending for", "Send for a doctor", "Doctor may be sent"], correct: 2, reason: "The imperative passive converts to 'Send for a doctor'." },
+        { id: 9, question: "The antonym of 'Attractive' is:", options: ["Repugnant", "Bad", "Loathsome", "Repulsive"], correct: 3, reason: "'Repulsive' is the most standard direct opposite of 'Attractive'." },
+        { id: 10, question: "I am tired ........... waiting for him. (Choose the suitable preposition):", options: ["with", "by", "of", "from"], correct: 2, reason: "The correct phrase is 'tired of'." },
+        { id: 11, question: "The man who came ........... would not get seat. (Choose the most suitable option):", options: ["last", "nearest", "latest", "early"], correct: 0, reason: "'Came last' fits the context." },
+        { id: 12, question: "Choose the odd one:", options: ["Car", "Steamer", "Ship", "Kettle"], correct: 3, reason: "Car, Steamer, and Ship are modes of transport. Kettle is a vessel." },
+        { id: 13, question: "He wants Seema ........... the work. (Choose the correct option):", options: ["does", "did", "to do", "doing"], correct: 2, reason: "The verb 'want' is followed by an infinitive (to + verb)." },
+        { id: 14, question: "Choose the correct sentence:", options: ["The railways will compensate us for the loss", "The railways will compensate us with the loss", "The railways will compensate we for the loss", "The railways will compensate us with the loss"], correct: 0, reason: "'Compensate' takes the preposition 'for'." },
+        { id: 15, question: "I read the Ramayana (Choose the suitable phrase):", options: ["narrow escape", "more or less", "now and again", "neck and neck"], correct: 2, reason: "'Now and again' means occasionally." },
+        { id: 16, question: "You will get the prize ........... you deserve it. (Choose the correct conjunction):", options: ["if", "till", "than", "unless"], correct: 0, reason: "'If' acts as a conditional conjunction here." },
+        { id: 17, question: "I ........... eaten. (Choose the correct auxiliary verb):", options: ["have", "might", "may", "should"], correct: 0, reason: "'Have' forms the Present Perfect tense." },
+        { id: 18, question: "They were watching me. (Choose the best passive voice):", options: ["I was watched by them", "They were watched by me", "I was being watched", "Me was watched by them"], correct: 2, reason: "Past continuous passive is 'was/were being + past participle'." },
+        { id: 19, question: "Choose the correct sentence:", options: ["His bride is beautiful", "Beautiful bride is his", "Bride had beautiful", "He bride is beautiful"], correct: 0, reason: "Subject + Verb + Complement structure is correct in option (a)." },
+        { id: 20, question: "He was accused of (Choose the suitable option):", options: ["steal", "stole", "stealing", "stolen"], correct: 2, reason: "Preposition 'of' is followed by a gerund (stealing)." },
+        { id: 21, question: "He has read ........... Vedas. (Choose the correct option):", options: ["a", "an", "the", "no article"], correct: 2, reason: "Definite article 'the' is used before sacred texts." },
+        { id: 22, question: "Choose the correctly spelt word:", options: ["Remeins", "Remeuns", "Rimunes", "Remains"], correct: 3, reason: "Correct spelling is 'Remains'." },
+        { id: 23, question: "Rita did not clean the room. (Choose the suitable passive voice):", options: ["Rita not cleaning the room", "The room has not been cleaned by Rita", "The room was not cleaned by Rita", "Room-cleaning is not done by Rita"], correct: 2, reason: "Simple past passive is 'was/were + past participle'." },
+        { id: 24, question: "A place for luggage at a railway station is called:", options: ["Compartment", "Waiting room", "Cloak room", "Platform"], correct: 2, reason: "A cloakroom is used to leave luggage temporarily." },
+        { id: 25, question: "I will meet him ........... the way. (Choose the correct preposition):", options: ["on", "at", "by", "for"], correct: 0, reason: "The idiom is 'on the way'." },
+        { id: 26, question: "He labours hard. He has to survive. (Choose the suitable combination):", options: ["He labouring hard and has to survive", "He laboured hard and is surviving", "He is labouring hard and had to survive", "He labours hard to survive"], correct: 3, reason: "'To survive' expresses purpose." },
+        { id: 27, question: "I ........... to drive that car. (Choose the best option):", options: ["used to", "can", "need", "will"], correct: 0, reason: "'Used to' expresses a past habit." },
+        { id: 28, question: "He said, 'Where is my bicycle?' (Choose the correct indirect speech):", options: ["He says where is his bicycle", "He asked where his bicycle was", "He will ask where is my bicycle", "He may ask where is my bicycle"], correct: 1, reason: "Tense shifts back to past ('is' -> 'was')." },
+        { id: 29, question: "Are you aware ........... the danger? (Choose the correct preposition):", options: ["at", "by", "of", "on"], correct: 2, reason: "Aware takes the preposition 'of'." },
+        { id: 30, question: "If you ..........., I will help you. (Choose the correct option):", options: ["came", "will come", "come", "coming"], correct: 2, reason: "First conditional uses present simple in the 'if' clause." },
+        { id: 31, question: "Give one word substitution for: 'Fit to be chosen':", options: ["Eligible", "Suitable", "Capable", "Valuable"], correct: 0, reason: "Eligible means fit to be chosen." },
+        { id: 32, question: "Binita ........... know the answer. (Choose the correct option):", options: ["don't", "doesn't", "hasn't", "haven't"], correct: 1, reason: "Binita is singular, so 'doesn't' is correct." },
+        { id: 33, question: "We are going to talk with our enemies. (Choose the correct antonym of the underlined word):", options: ["Lost", "Friends", "Neighbours", "Rivals"], correct: 1, reason: "Antonym of enemies is friends." },
+        { id: 34, question: "The teacher says, 'Rose smells sweet'. (Choose the correct indirect narration):", options: ["The teacher says that rose smells sweet", "The teacher says that rose smelled sweet", "The teacher says roses smell sweet", "Roses smell sweet is said by the teacher"], correct: 0, reason: "Reporting verb 'says' keeps the tense unchanged." },
+        { id: 35, question: "Choose the correct spelt word:", options: ["Confes", "Confies", "Confess", "Contace"], correct: 2, reason: "Correct spelling is 'Confess'." },
+        { id: 36, question: "Miss Eliza speaks ........... Chinese. (Choose the correct option):", options: ["a", "an", "the", "no article"], correct: 3, reason: "No article before languages." },
+        { id: 37, question: "I ........... like listening classical music. (Choose the best option):", options: ["do not", "have not", "does not", "has not"], correct: 0, reason: "Simple present negative with 'I' uses 'do not'." },
+        { id: 38, question: "I ........... my application yesterday. (Choose the correct option):", options: ["written", "has written", "wrote", "will write"], correct: 2, reason: "'Yesterday' requires simple past." },
+        { id: 39, question: "There is a ........... over the Ganga. (Choose the suitable option):", options: ["ancient", "belief", "universe", "bridge"], correct: 3, reason: "A bridge is built over a river." },
+        { id: 40, question: "I saw two crows ........... poking their heads at the flowerpot. (Choose the suitable option):", options: ["play", "playing", "playfully", "played"], correct: 1, reason: "Present participle 'playing' describes ongoing action." },
+        { id: 41, question: "He is ........... of me. (Choose the suitable option):", options: ["zealous", "jealous", "puzzled", "confused"], correct: 1, reason: "Collocation is 'jealous of'." },
+        { id: 42, question: "Daylight ........... away. (Choose the suitable option):", options: ["faded", "fading", "far", "furthest"], correct: 1, reason: "'Fading away' describes the continuous process." },
+        { id: 43, question: "A teacher needs to discuss in the class, as it ........... curiosity in students. (Choose the correct option):", options: ["creates", "created", "create", "will creates"], correct: 0, reason: "Singular 'it' takes 'creates' in present tense." },
+        { id: 44, question: "Can the deaf hear? (Choose the correct negative sentence):", options: ["Can the deaf not hear?", "Could the deaf not hear?", "The deaf do not hear.", "The deaf can't hear."], correct: 3, reason: "Direct negative statement is 'The deaf can't hear'." },
+        { id: 45, question: "We can make no progress if we continue working ........... these conditions. (Choose the correct preposition):", options: ["into", "with", "under", "for"], correct: 2, reason: "Collocation is 'working under conditions'." },
+        { id: 46, question: "Choose the incorrect sentence:", options: ["He is seeking employment", "We hear radio in the morning", "She plays in the evening", "He invited me to dinner"], correct: 1, reason: "It should be 'listen to the radio'." },
+        { id: 47, question: "The picture ........... on the wall. (Choose the correct option):", options: ["hang", "hanging", "hanged", "was hung"], correct: 3, reason: "For objects, past participle is 'hung'." },
+        { id: 48, question: "Choose the correctly spelt word:", options: ["Procede", "Proccede", "Proceed", "Proced"], correct: 2, reason: "Correct spelling is 'Proceed'." },
+        { id: 49, question: "Neeraj wrote this letter yesterday. (Choose the correct passive voice):", options: ["Yesterday was written letter by Neeraj", "This letter is written by Neeraj yesterday", "This letter was written by Neeraj yesterday", "This letter was wrote by Neeraj yesterday"], correct: 2, reason: "Simple past passive is 'was written'." },
+        { id: 50, question: "Why ........... you come to the party yesterday. (Choose the correct option):", options: ["haven't", "didn't", "shouldn't", "wouldn't"], correct: 1, reason: "'Yesterday' requires past simple auxiliary 'did'." },
+        { id: 51, question: "I wish I ........... a minister. (Choose the correct tense form):", options: ["was", "had", "have", "were"], correct: 3, reason: "Subjunctive mood 'were' is used after 'I wish'." },
+        { id: 52, question: "He said, 'Be quiet and listen to my words'. (Choose the most suitable indirect speech):", options: ["He urged them to be quiet and listen to his words", "He urged them and said be quiet and listen to words", "He said they should be quiet and listen to his words", "He said you should be quiet and listen to my words"], correct: 0, reason: "Imperative becomes 'urged + to + infinitive'." },
+        { id: 53, question: "What are you ........... about? (Choose the correct tense form):", options: ["talk", "talking", "will talk", "talked"], correct: 1, reason: "Present continuous uses verb+ing." },
+        { id: 54, question: "Such conduct deserves reprimand. (Choose the correct meaning of the underlined word):", options: ["praise", "rebuke", "reprisal", "reward"], correct: 1, reason: "Reprimand means rebuke." },
+        { id: 55, question: "This is a kilo ........... rice for you. (Choose the correct preposition):", options: ["of", "for", "at", "on"], correct: 0, reason: "Measurements use 'of'." },
+        { id: 56, question: "Why don't ........... go outside? (Choose the best option):", options: ["he", "she", "it", "you"], correct: 3, reason: "Standard suggestion phrase is 'Why don't you'." },
+        { id: 57, question: "Of all the students in the class, Ram is surely: (Choose the best option):", options: ["the more intelligent", "the most intelligent", "the intelligent more", "more the intelligent"], correct: 1, reason: "Comparing to 'all' requires superlative 'most'." },
+        { id: 58, question: "I'd like ........... swimming this afternoon. (Choose the correct option):", options: ["go", "went", "going", "to go"], correct: 3, reason: "'Would like' takes an infinitive 'to go'." },
+        { id: 59, question: "The ruling party will have to put its own house ........... order. (Choose the correct preposition):", options: ["in", "on", "to", "into"], correct: 0, reason: "The idiom is 'put one's house in order'." },
+        { id: 60, question: "We've done our job, ........... ? (Choose the best question tag):", options: ["didn't we", "haven't we", "have we", "did we"], correct: 1, reason: "Positive statement 'We've' takes negative tag 'haven't we'." },
+        { id: 61, question: "According to T.S. Eliot Macavity is an/a:", options: ["master criminal", "convicted criminal", "ordinary criminal", "American criminal"], correct: 0, reason: "Macavity is described as a master criminal." },
+        { id: 62, question: "The soldier in the poem 'The Soldier' is:", options: ["French", "English", "German", "Spanish"], correct: 1, reason: "The poem is about an English soldier." },
+        { id: 63, question: "'I permit to speak at every hazard,' is taken from:", options: ["Song of Myself", "Snake", "The Soldier", "An Epitaph"], correct: 0, reason: "From Walt Whitman's 'Song of Myself'." },
+        { id: 64, question: "'However, rare - rare it be; And when I crumble....' is taken from:", options: ["Fire-Hymn", "Ode to Autumn", "Snake", "An Epitaph"], correct: 3, reason: "From Walter de la Mare's 'An Epitaph'." },
+        { id: 65, question: "Old English is characterised by (Choose the correct option):", options: ["syntax", "synthesis", "inflections", "linguistics"], correct: 2, reason: "Old English is highly inflected." },
+        { id: 66, question: "Today, it is impossible to think and imagine a world without the (Choose the correct option):", options: ["old methods of agriculture", "printing machine", "bullock carts", "illiterate people"], correct: 1, reason: "The printing machine is foundational to modern civilization." },
+        { id: 67, question: "The 18th century is known as the (Choose the correct option):", options: ["Cavalier Age", "Jacobean Age", "Augustan Age", "Romantic Age"], correct: 2, reason: "First half of 18th century is the Augustan Age." },
+        { id: 68, question: "Oliver Goldsmith emphasized on the purity of (Choose the correct option):", options: ["city life", "village life", "town life", "domestic life"], correct: 1, reason: "He idealized village life in 'The Deserted Village'." },
+        { id: 69, question: "'Come, My Beloved' is written by (Choose the correct option):", options: ["Pearl S. Buck", "Mahatma Gandhi", "Dr. Zakir Hussain", "Germaine Greer"], correct: 0, reason: "Written by Pearl S. Buck." },
+        { id: 70, question: "'But believe that I shall make speedier journeys,' is taken from (Choose the correct option):", options: ["To Autumn", "Fire-Hymn", "Macavity: The Mystery Cat", "Sweetest Love I Do Not Goe"], correct: 3, reason: "From John Donne's poem." },
+        { id: 71, question: "'To Autumn' is a/an (Choose the correct option):", options: ["Hymn", "Ode", "Ballad", "Elegy"], correct: 1, reason: "It is an ode." },
+        { id: 72, question: "'Her sights and sounds, dreams happy as her day' is taken from (Choose the correct option):", options: ["Snake", "Fir-Hymn", "The Soldier", "Now the Leaves are Falling Fast"], correct: 2, reason: "From Rupert Brooke's 'The Soldier'." },
+        { id: 73, question: "According to Bertrand Russell, ........... die in large numbers in winter. (Choose the correct option):", options: ["Human beings", "Plants", "Animals", "Birds"], correct: 1, reason: "Plants die in winter, as per the essay." },
+        { id: 74, question: "........... were satisfied with true Home Rule. (Choose the correct option):", options: ["Our ancestors", "Germans", "Italians", "Greeks"], correct: 0, reason: "Gandhi notes our ancestors were satisfied with true Home Rule." },
+        { id: 75, question: "'I swore to save fire, From the sin of forgetfulness' is taken from (Choose the correct option):", options: ["Snake", "Ode to Autumn", "Fire-Hymn", "The Soldier"], correct: 2, reason: "From Keki N. Daruwala's 'Fire-Hymn'." },
+        { id: 76, question: "Walt Whitman worked as a Volunteer nurse in (Choose the correct option):", options: ["the Civil war", "Crimean war", "Second World war", "First World war"], correct: 0, reason: "During the American Civil War." },
+        { id: 77, question: "Who is dumb in 'Now the Leaves are Falling Fast'? (Choose the correct option):", options: ["Angel", "Poet", "Trees", "Nightingale"], correct: 1, reason: "The poet is dumb/unable to express sorrow." },
+        { id: 78, question: "The poet in 'Snake' picked up a ........... log. (Choose the correct option):", options: ["hard", "clumsy", "soft", "metal"], correct: 1, reason: "He picked up a clumsy log." },
+        { id: 79, question: "Who sits carelessly on the granary floor in 'Ode to autumn'? (Choose the correct option):", options: ["Old man", "Children", "Young men", "Woman"], correct: 2, reason: "The personified Autumn is often depicted as sitting carelessly on the granary floor." },
+        { id: 80, question: "Seibi would examine the ........... as soon as he got up. (Choose the correct option):", options: ["gourds", "painting", "books", "food"], correct: 0, reason: "In 'The Artist', Seibi is obsessed with gourds." },
+        { id: 81, question: "When is censorship imposed on press in a country like Britain? (Choose the correct option):", options: ["During flood", "During emergency", "During election", "During disasters"], correct: 1, reason: "Censorship can be imposed during a state of emergency." },
+        { id: 82, question: "........... is sweltering with the heat of injustice and oppression. (Choose the correct option):", options: ["New York", "New Jersey", "Mississippi", "Chicago"], correct: 2, reason: "From MLK's speech, Mississippi is mentioned." },
+        { id: 83, question: "Lomov and ........... are quarrelling for the Ox Meadows. (Choose the correct option):", options: ["Natalia", "Choobookov", "Somov", "Natasha"], correct: 0, reason: "Lomov and Natalia argue over Ox Meadows." },
+        { id: 84, question: "The type of gourds that appealed to Seibi was (Choose the correct option):", options: ["unpolished", "peculiar", "even and symmetrical", "old and gnarled"], correct: 1, reason: "He preferred peculiar shapes." },
+        { id: 85, question: "India remains immovable and that is her (Choose the correct option):", options: ["independence", "glory", "honesty", "power"], correct: 1, reason: "Dr. Zakir Hussain says her immovability is her glory." },
+        { id: 86, question: "The food in Indian villages was served on ........... leaves. (Choose the correct option):", options: ["banana", "peepal", "mango", "papaya"], correct: 0, reason: "Served on banana leaves." },
+        { id: 87, question: "The ........... advised Benjy to keep hens. (Choose the correct option):", options: ["grandparents", "sister", "teacher", "doctor"], correct: 3, reason: "The doctor advised Benjy to keep hens." },
+        { id: 88, question: "A woman has to observe various customs and rituals during (Choose the correct option):", options: ["education", "cooking", "having bath", "pregnancy"], correct: 3, reason: "During pregnancy, as per 'A Child is Born'." },
+        { id: 89, question: "In the poem 'Snake', Lawrence exalts the values of ........... life. (Choose the correct option):", options: ["primitive", "city", "civilized", "artificial"], correct: 0, reason: "He exalts primitive, natural life." },
+        { id: 90, question: "Snakes were seen, among ........... in 'My Grandmother's House'. (Choose the correct option):", options: ["beds", "books", "tables", "chairs"], correct: 1, reason: "Among books." },
+        { id: 91, question: "Who wanted to kill the Snake? (Choose the correct option):", options: ["The poet", "The neighbour", "The gardener", "The children"], correct: 0, reason: "The poet himself felt the urge to kill it." },
+        { id: 92, question: "Who wrote 'Hyperion' and 'Endymion'? (Choose the correct option):", options: ["William Wordsworth", "John Keats", "P. B. Shelley", "S. T. Coleridge"], correct: 1, reason: "John Keats wrote both." },
+        { id: 93, question: "'The more we indulge in our passions, the more unbridled they become' is taken from (Choose the correct option):", options: ["Bharat is My Home", "Indian Civilization and Culture", "How Free is the Press", "A Child is Born"], correct: 1, reason: "From Gandhi's essay." },
+        { id: 94, question: "The mother in 'A Pinch of Snuff' was waiting at the ........... for her brother. (Choose the correct option):", options: ["room", "gate", "doorstep", "verandah"], correct: 2, reason: "Waiting at the doorstep." },
+        { id: 95, question: "The editorial policy of a popular daily is controlled by ........... chief factors. (Choose the correct option):", options: ["two", "three", "four", "five"], correct: 2, reason: "Four chief factors." },
+        { id: 96, question: "Benjy owned a (Choose the correct option):", options: ["Contessa Car", "Hyundai Car", "Honda City", "Ford Van"], correct: 0, reason: "He owned a Contessa car." },
+        { id: 97, question: "The texts of which period are difficult to read and understand? (Choose the correct option):", options: ["Middle English", "Old English", "Modern English", "Post-modern English"], correct: 1, reason: "Old English is difficult." },
+        { id: 98, question: "Langland and Chaucer belonged to the ........... period. (Choose the correct option):", options: ["Old English", "Modern English", "Post-modern English", "Middle English"], correct: 3, reason: "Middle English period." },
+        { id: 99, question: "Who wrote 'A Passage to India'? (Choose the correct option):", options: ["E. M. Forster", "W. B. Yeats", "T. S. Eliot", "D. H. Lawrence"], correct: 0, reason: "E. M. Forster wrote it." },
+        { id: 100, question: "Spelling 'Color' is used in (Choose the correct option):", options: ["Indian English", "French", "British English", "American English"], correct: 3, reason: "American English drops the 'u'." }
+    ];
+
+    let currentStudentName = "";
+    let userAnswers = {}; // Stores user's answers
+
+    // --- SCROLL TO TOP LOGIC ---
+    let mybutton = document.getElementById("scrollTopBtn");
+    window.onscroll = function() { scrollFunction() };
+    function scrollFunction() {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            mybutton.style.display = "flex";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+    function topFunction() {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
+
+    // --- NAVIGATION FUNCTIONS ---
+    function showSection(sectionId) {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active-section'));
+        document.getElementById(sectionId).classList.add('active-section');
+        topFunction();
+    }
+
+    // --- 1. LOGIN / START TEST ---
+    function startTest() {
+        const nameInput = document.getElementById('studentName').value.trim();
+        if (nameInput === "") {
+            alert("Please enter your name!");
+            return;
+        }
+        currentStudentName = nameInput;
+        renderQuestions();
+        showSection('quiz-section');
+    }
+
+    // --- 2. RENDER QUESTIONS (WITH INSTANT FEEDBACK LOGIC) ---
+    function renderQuestions() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = "";
+        
+        questions.forEach((q, index) => {
+            let html = `<div class="question-box" id="qbox-${q.id}">`;
+            html += `<div class="question-text">Q${q.id}. ${q.question}</div>`;
+            
+            // Options
+            q.options.forEach((opt, optIndex) => {
+                html += `
+                    <div class="option" id="opt-${q.id}-${optIndex}" onclick="checkAnswerInstant(${q.id}, ${optIndex})">
+                        <strong>${String.fromCharCode(65 + optIndex)}.</strong> ${opt}
+                    </div>
+                `;
+            });
+            
+            // Reason Box (Hidden initially)
+            html += `<div class="instant-reason" id="reason-${q.id}">
+                        <strong>Reason:</strong> ${q.reason}
+                     </div>`;
+            
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    // --- 3. INSTANT FEEDBACK ON CLICK ---
+    function checkAnswerInstant(qId, selectedIndex) {
+        // If already answered, do nothing (lock)
+        if (userAnswers[qId] !== undefined) return;
+
+        const qData = questions.find(q => q.id === qId);
+        const correctIndex = qData.correct;
+        
+        // Record answer
+        userAnswers[qId] = selectedIndex;
+
+        // Visual updates
+        const selectedOptElement = document.getElementById(`opt-${qId}-${selectedIndex}`);
+        const correctOptElement = document.getElementById(`opt-${qId}-${correctIndex}`);
+        const reasonElement = document.getElementById(`reason-${qId}`);
+
+        // Lock all options for this question
+        qData.options.forEach((_, i) => {
+            document.getElementById(`opt-${qId}-${i}`).classList.add('locked');
+        });
+
+        if (selectedIndex === correctIndex) {
+            selectedOptElement.classList.add('correct-ans');
+        } else {
+            selectedOptElement.classList.add('wrong-ans');
+            correctOptElement.classList.add('correct-ans');
+        }
+
+        // Show Reason
+        reasonElement.style.display = "block";
+    }
+
+    // --- 4. SUBMIT TEST ---
+    function submitTest() {
+        const answeredCount = Object.keys(userAnswers).length;
+        const totalQuestions = questions.length;
+        
+        // Allow submission anytime, but warn if incomplete
+        if (answeredCount < totalQuestions) {
+            const confirmSubmit = confirm(`You have answered ${answeredCount} out of ${totalQuestions} questions.\n\nDo you want to submit anyway? Unanswered questions will be marked wrong.`);
+            if (!confirmSubmit) return;
+        }
+
+        // Calculate Score
+        let score = 0;
+        questions.forEach(q => {
+            if (userAnswers[q.id] === q.correct) {
+                score++;
+            }
+        });
+
+        saveToDatabase(currentStudentName, score, totalQuestions);
+        showResults(score, totalQuestions);
+    }
+
+    // --- 5. SHOW RESULTS ---
+    function showResults(score, totalQuestions) {
+        document.getElementById('score-display').innerText = `${currentStudentName}, your score is: ${score} / ${totalQuestions}`;
+        
+        const reviewContainer = document.getElementById('review-container');
+        reviewContainer.innerHTML = "";
+
+        questions.forEach((q, index) => {
+            const userAns = userAnswers[q.id];
+            const isCorrect = userAns === q.correct;
+            
+            // For unanswered questions
+            let userAnswerText = userAns !== undefined ? q.options[userAns] : "Not Answered";
+
+            let html = `<div class="result-box ${isCorrect ? 'correct' : 'incorrect'}">`;
+            html += `<strong>Q${q.id}. ${q.question}</strong><br><br>`;
+            
+            html += `<span style="color: ${isCorrect ? '#28a745' : '#dc3545'};"><strong>Your Answer:</strong> ${userAnswerText}</span><br>`;
+            
+            if (!isCorrect) {
+                html += `<span style="color: #28a745;"><strong>Correct Answer:</strong> ${q.options[q.correct]}</span><br>`;
+            }
+            
+            html += `<div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.6); border-radius: 8px;"><strong>Reason:</strong> ${q.reason}</div>`;
+            html += `</div>`;
+            
+            reviewContainer.innerHTML += html;
+        });
+
+        showSection('result-section');
+    }
+
+    // --- 6. DATABASE (LOCAL STORAGE) & RANK LIST ---
+    function saveToDatabase(name, score, total) {
+        let students = JSON.parse(localStorage.getItem('pyq_students')) || [];
+        const date = new Date().toLocaleDateString();
+        
+        students.push({ name, score, total, date });
+        
+        // Sort by score descending
+        students.sort((a, b) => b.score - a.score);
+        
+        localStorage.setItem('pyq_students', JSON.stringify(students));
+    }
+
+    function showRankListPrompt() {
+        showSection('rank-section');
+        document.getElementById('password-prompt').style.display = 'block';
+        document.getElementById('rank-list-data').style.display = 'none';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function checkPassword() {
+        const password = document.getElementById('adminPassword').value;
+        
+        // PASSWORD LOGIC
+        if (password === "Alisha123") {
+            document.getElementById('password-prompt').style.display = 'none';
+            document.getElementById('rank-list-data').style.display = 'block';
+            renderRankList();
+        } else {
+            alert("Incorrect Password!");
+        }
+    }
+
+    function renderRankList() {
+        const tbody = document.getElementById('rank-tbody');
+        tbody.innerHTML = "";
+        
+        let students = JSON.parse(localStorage.getItem('pyq_students')) || [];
+        
+        if (students.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No students have taken the test yet.</td></tr>";
+            return;
+        }
+
+        students.forEach((student, index) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${student.name}</td>
+                <td>${student.score} / ${student.total}</td>
+                <td>${student.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+</script>
+
+</body>
+</html>
